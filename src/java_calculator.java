@@ -14,6 +14,12 @@ public class java_calculator extends javax.swing.JFrame {
     /**
      * Creates new form java_calculator
      */
+    
+    float num1 = 0, num2=0, oprClickCount=0;
+    String opr = "";
+    boolean isOprClick = false, isEqualClick = false;
+    
+    
     public java_calculator() {
         initComponents();
         
@@ -29,22 +35,123 @@ public class java_calculator extends javax.swing.JFrame {
         ActionListener acLis = new ActionListener(){
             
             @Override
-            public void actionPerformed(ActionEvent e){
-                
-                
-                
-                jTextField1.setText(jTextField1.getText()+button.getText());
-                
+             public void actionPerformed(ActionEvent e) {
+             
+                // Ako je operator button
+                if(!isOperator(button))
+                {
+                    if(isOprClick)// ako je operacija neka kliknuta
+                    {
+                        num1 = Float.valueOf(jTextField1.getText());
+                        jTextField1.setText("");
+                    }
+                    
+                    if(!jTextField1.getText().contains(".")){ //Ako input nije '.'
+
+                        if(jTextField1.getText().equals("0") && !button.getText().equals(".")){
+                            // Ako je na početku 0
+                            // a uz to još tačka '.' nije kliknuta clearuje se polje
+                            jTextField1.setText(button.getText());
+                            isOprClick = false;
+                       }
+                        else
+                        {
+                        jTextField1.setText(jTextField1.getText()+button.getText());
+                        isOprClick = false;
+                        }
+                    }
+                    else if(!button.getText().equals(".")){
+                        jTextField1.setText(jTextField1.getText()+button.getText());
+                        isOprClick = false;
+                    }
+                }
+                else{// ako je button koji je kliknut operacija [+ - * / =]
+                   
+                    if(oprClickCount == 0)// Ako je operacija kliknuta prvi put
+                    {
+                        oprClickCount++;
+                        // stavljamo textfield na float
+                        num1 = Float.valueOf(jTextField1.getText());
+                        opr = button.getText();
+                        isOprClick = true;
+                    }else{
+                        
+                        if(!button.getText().equals("="))//ako operacija nije =
+                        {
+                            if(!isEqualClick)
+                            {
+                                num2 = Float.valueOf(jTextField1.getText());
+                                jTextField1.setText(Float.toString(calc(opr, num1, num2)));
+                                opr = button.getText();
+                                num2 = Float.valueOf(jTextField1.getText());
+                                isOprClick = true;
+                                isEqualClick = false;
+                            }else{
+                                isEqualClick = false;
+                                opr = button.getText();
+                            }
+                        }
+                        else{
+                            num2 = Float.valueOf(jTextField1.getText());
+                            jTextField1.setText(Float.toString(calc(opr, num1, num2)));
+                            num1 = Float.valueOf(jTextField1.getText());
+                            isOprClick = true;
+                            isEqualClick = true;
+                        }
+                        
+                    }                    
+                    
+                }
+            
             }
-            
-            
         };
-        return acLis;
+        return acLis;        
     }
     
     
     //Funkcija za racunanje dva broja i vracanje rezultata
+  public float calc(String op, float n1, float n2)
+    {
+        float result = 0;
+        
+        switch(op){
+            case "+":
+                    result = n1 + n2;
+                    break;
+            case "-":
+                    result = n1 - n2;
+                    break;
+            case "*":
+                    result = n1 * n2;
+                    break;
+            case "/":
+                    if(n2 != 0)
+                       result = n1 / n2;
+                    break;
+            default:
+                    break;        
+        }
+        
+        return result;
+    }
     
+  
+  // da li je button operator
+     public boolean isOperator(JButton button)
+    {
+        String buttonText = button.getText();
+        
+        if(buttonText.equals("+") || buttonText.equals("-") ||
+           buttonText.equals("*") || buttonText.equals("/") ||
+           buttonText.equals("="))
+        {
+            return true;
+        }
+        else{
+            return false;
+        }
+        
+    }
     
     
     //dodajemo ono što će se desiti sa svim buttonim-a
@@ -145,7 +252,6 @@ public class java_calculator extends javax.swing.JFrame {
         jButton15.setText("=");
 
         jTextField1.setFont(new java.awt.Font("PMingLiU-ExtB", 0, 36)); // NOI18N
-        jTextField1.setText("123456789");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
